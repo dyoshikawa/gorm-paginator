@@ -17,14 +17,19 @@ type Param struct {
 
 // Paginator 分页返回
 type Paginator struct {
-	TotalRecord int         `json:"total_record"`
-	TotalPage   int         `json:"total_page"`
+	TotalRecord int         `json:"total_record" json_camel:"totalRecord"`
+	TotalPage   int         `json:"total_page" json_camel:"totalPage"`
 	Records     interface{} `json:"records"`
 	Offset      int         `json:"offset"`
 	Limit       int         `json:"limit"`
 	Page        int         `json:"page"`
-	PrevPage    int         `json:"prev_page"`
-	NextPage    int         `json:"next_page"`
+	PrevPage    int         `json:"prev_page" json_camel:"prevPage"`
+	NextPage    int         `json:"next_page" json_camel:"prevPage"`
+}
+
+func countRecords(db *gorm.DB, anyType interface{}, done chan bool, count *int) {
+	db.Model(anyType).Count(count)
+	done <- true
 }
 
 // Paging 分页
@@ -82,9 +87,4 @@ func Paging(p *Param, result interface{}) *Paginator {
 		paginator.NextPage = p.Page + 1
 	}
 	return &paginator
-}
-
-func countRecords(db *gorm.DB, anyType interface{}, done chan bool, count *int) {
-	db.Model(anyType).Count(count)
-	done <- true
 }
